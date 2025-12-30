@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+*.log
+
+# Production
+build/
+dist/
+.next/
+out/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads & Storage
+backend/uploads/*
+!backend/uploads/.gitkeep
+storage/videos/*
+storage/thumbnails/*
+storage/logos/*
+storage/music/*
+!storage/**/.gitkeep
+
+# Database
+*.db
+*.db-journal
+
+# Docker
+*.log
+
+# Misc
+.turbo
+.vercel
+.cache

@@ -1,0 +1,275 @@
+// Aervo - Prisma Database Schema
+// PostgreSQL database schema for the virtual drone video platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// AUTH & USERS
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String?   // null for OAuth users
+  firstName     String?
+  lastName      String?
+  phone         String?
+  emailVerified Boolean   @default(false)
+  isBlocked     Boolean   @default(false)
+  role          UserRole  @default(USER)
+
+  // OAuth
+  googleId      String?   @unique
+
+  // Relations
+  orders        Order[]
+  invoices      Invoice[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([email])
+  @@index([googleId])
+  @@map("users")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+// ============================================
+// ORDERS
+// ============================================
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique // AER-2025-00001
+
+  // User
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Location
+  address         String
+  latitude        Float
+  longitude       Float
+
+  // Package
+  packageType     PackageType
+  duration        Int         // seconds
+  resolution      String      // 1080p, 4K
+  cameraAngles    String[]    // ["spiral", "zoom_in", "orbit"]
+
+  // Addons
+  hasLogo         Boolean     @default(false)
+  logoUrl         String?
+  hasCustomMusic  Boolean     @default(false)
+  customMusicUrl  String?
+  isUrgent        Boolean     @default(false)
+
+  // Pricing (in TRY)
+  basePrice       Float
+  addonsPrice     Float       @default(0)
+  urgentFee       Float       @default(0)
+  totalPrice      Float
+
+  // Status
+  status          OrderStatus @default(PENDING)
+
+  // Video
+  videoUrl        String?
+  thumbnailUrl    String?
+  renderStartedAt DateTime?
+  renderEndedAt   DateTime?
+  renderDuration  Int?        // in seconds
+
+  // Payment
+  paymentId       String?
+  paymentStatus   PaymentStatus @default(PENDING)
+  paidAt          DateTime?
+
+  // System
+  retryCount      Int         @default(0)
+  errorMessage    String?
+  processingLog   String?     @db.Text
+
+  // Relations
+  invoice         Invoice?
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([orderNumber])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+enum PackageType {
+  STARTER       // Başlangıç
+  PROFESSIONAL  // Profesyonel
+  ENTERPRISE    // Kurumsal
+}
+
+enum OrderStatus {
+  PENDING           // Ödeme bekliyor
+  PAID              // Ödeme alındı
+  QUEUED            // Kuyrukta
+  PROCESSING        // İşleniyor (data fetch)
+  RENDERING         // Render ediliyor
+  COMPLETED         // Tamamlandı
+  FAILED            // Başarısız
+  CANCELLED         // İptal
+  REFUNDED          // İade edildi
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+// ============================================
+// INVOICES
+// ============================================
+
+model Invoice {
+  id              String   @id @default(cuid())
+  invoiceNumber   String   @unique // INV-2025-00001
+
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  orderId         String   @unique
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  // Billing info
+  companyName     String?
+  taxNumber       String?
+  billingAddress  String?
+  city            String?
+  country         String   @default("TR")
+
+  // Amount
+  amount          Float
+  currency        String   @default("TRY")
+  taxAmount       Float    @default(0)
+
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@index([invoiceNumber])
+  @@index([createdAt])
+  @@map("invoices")
+}
+
+// ============================================
+// PACKAGES (Admin editable pricing)
+// ============================================
+
+model Package {
+  id          String      @id @default(cuid())
+  type        PackageType @unique
+  name        String      // "Başlangıç"
+  description String?     @db.Text
+  duration    Int         // seconds (30, 60, 90)
+  resolution  String      // "1080p", "4K"
+  maxAngles   Int         // Maximum camera angles allowed
+  price       Float       // Base price in TRY
+  features    String[]    // ["1 kamera açısı", "30 saniye", "1080p kalite"]
+  isActive    Boolean     @default(true)
+  sortOrder   Int         @default(0)
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("packages")
+}
+
+// ============================================
+// SETTINGS (Key-Value store)
+// ============================================
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  category  String   @default("general") // general, pricing, email, system
+
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@map("settings")
+}
+
+// ============================================
+// EMAIL TEMPLATES
+// ============================================
+
+model EmailTemplate {
+  id       String   @id @default(cuid())
+  key      String   @unique // order_confirmation, video_ready, welcome, etc.
+  name     String   // Display name
+  subject  String
+  html     String   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("email_templates")
+}
+
+// ============================================
+// ANALYTICS
+// ============================================
+
+model PopularLocation {
+  id        String   @id @default(cuid())
+  address   String
+  city      String?
+  country   String   @default("TR")
+  latitude  Float
+  longitude Float
+  orderCount Int     @default(1)
+  lastOrderAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([latitude, longitude])
+  @@index([orderCount])
+  @@map("popular_locations")
+}
+
+// ============================================
+// SYSTEM LOGS
+// ============================================
+
+model SystemLog {
+  id        String   @id @default(cuid())
+  level     LogLevel // INFO, WARN, ERROR
+  message   String   @db.Text
+  context   String?  // controller name, service name, etc.
+  metadata  Json?    // Additional data
+
+  createdAt DateTime @default(now())
+
+  @@index([level])
+  @@index([createdAt])
+  @@map("system_logs")
+}
+
+enum LogLevel {
+  INFO
+  WARN
+  ERROR
+}
