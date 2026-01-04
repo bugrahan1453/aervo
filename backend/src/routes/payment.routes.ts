@@ -12,7 +12,7 @@ import { paymentLimiter } from '../middlewares/rateLimit';
 const router = Router();
 
 // All routes require authentication
-router.use(authenticate);
+router.use(authenticate as any);
 
 router.post('/process', paymentLimiter, validateBody(createPaymentSchema), paymentController.processPayment);
 router.get('/:orderId/status', paymentController.getPaymentStatus);

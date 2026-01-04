@@ -18,7 +18,7 @@ export const register = asyncHandler(async (req: AuthRequest, res: Response) => 
   const { user, accessToken, refreshToken } = await authService.register(req.body);
 
   // Send welcome email (don't await to not block response)
-  sendWelcomeEmail(user.email, user.firstName).catch((err) =>
+  sendWelcomeEmail(user.email, user.firstName || undefined).catch((err) =>
     logger.error('Welcome email error:', err)
   );
 

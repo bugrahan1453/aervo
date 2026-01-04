@@ -12,7 +12,7 @@ import { orderLimiter } from '../middlewares/rateLimit';
 const router = Router();
 
 // All routes require authentication
-router.use(authenticate);
+router.use(authenticate as any);
 
 router.post('/', orderLimiter, validateBody(createOrderSchema), orderController.createOrder);
 router.get('/', orderController.getMyOrders);

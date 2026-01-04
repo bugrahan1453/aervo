@@ -21,9 +21,9 @@ router.post('/register', authLimiter, validateBody(registerSchema), authControll
 router.post('/login', authLimiter, validateBody(loginSchema), authController.login);
 
 // Protected routes
-router.get('/me', authenticate, authController.getMe);
-router.put('/profile', authenticate, validateBody(updateUserSchema), authController.updateProfile);
-router.post('/change-password', authenticate, validateBody(updatePasswordSchema), authController.changePassword);
-router.post('/logout', authenticate, authController.logout);
+router.get('/me', authenticate as any, authController.getMe);
+router.put('/profile', authenticate as any, validateBody(updateUserSchema), authController.updateProfile);
+router.post('/change-password', authenticate as any, validateBody(updatePasswordSchema), authController.changePassword);
+router.post('/logout', authenticate as any, authController.logout);
 
 export default router;

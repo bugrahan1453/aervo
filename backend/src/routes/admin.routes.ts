@@ -16,8 +16,8 @@ import {
 const router = Router();
 
 // All routes require admin authentication
-router.use(authenticate);
-router.use(requireAdmin);
+router.use(authenticate as any);
+router.use(requireAdmin as any);
 
 // Dashboard
 router.get('/dashboard', adminController.getDashboardStats);

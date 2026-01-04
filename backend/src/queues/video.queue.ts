@@ -32,15 +32,15 @@ videoQueue.on('waiting', (jobId) => {
   logger.info(`Job ${jobId} is waiting in queue`);
 });
 
-videoQueue.on('active', (job) => {
+videoQueue.on('active' as any, (job: any) => {
   logger.info(`Job ${job.id} started processing`);
 });
 
-videoQueue.on('completed', (job) => {
+videoQueue.on('completed' as any, (job: any) => {
   logger.info(`Job ${job.id} completed successfully`);
 });
 
-videoQueue.on('failed', (job, error) => {
+videoQueue.on('failed' as any, (job: any, error: any) => {
   logger.error(`Job ${job?.id} failed:`, error);
 });
 

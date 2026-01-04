@@ -10,7 +10,7 @@ import { logger } from '../utils/logger';
 import { EmailOptions, EmailTemplateData } from '../types';
 
 // Create transporter
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   host: env.SMTP_HOST,
   port: parseInt(env.SMTP_PORT, 10),
   secure: env.SMTP_SECURE === 'true',
