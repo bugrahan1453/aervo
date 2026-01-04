@@ -1,5 +1,23 @@
 # Aervo Video Processor - FFmpeg Dockerfile
 
+# Build stage
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies (including dev)
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Build TypeScript
+RUN npm run build
+
+# Production stage
 FROM node:20-alpine
 
 # Install FFmpeg and dependencies
@@ -13,14 +31,11 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
+# Install production dependencies only
 RUN npm install --only=production
 
-# Copy application
-COPY . .
-
-# Build TypeScript
-RUN npm run build
+# Copy built application from builder
+COPY --from=builder /app/dist ./dist
 
 # Create directories
 RUN mkdir -p /app/storage/temp
