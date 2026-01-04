@@ -17,7 +17,8 @@ const nextConfig = {
 
   // Experimental features
   experimental: {
-    optimizeCss: true,
+    // optimizeCss disabled due to critters dependency issue
+    // optimizeCss: true,
   },
 
   // Webpack configuration
