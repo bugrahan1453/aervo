@@ -24,11 +24,12 @@ export default function LoginPage() {
     try {
       const response: any = await authApi.login(formData);
 
-      if (response.user && response.accessToken) {
-        setAuth(response.user, response.accessToken);
+      if (response.success && response.data) {
+        const { user, accessToken } = response.data;
+        setAuth(user, accessToken);
 
         // Redirect based on role
-        if (response.user.role === 'ADMIN') {
+        if (user.role === 'ADMIN') {
           router.push('/admin');
         } else {
           router.push('/dashboard');

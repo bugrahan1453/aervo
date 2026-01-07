@@ -27,8 +27,9 @@ export default function RegisterPage() {
     try {
       const response: any = await authApi.register(formData);
 
-      if (response.user && response.accessToken) {
-        setAuth(response.user, response.accessToken);
+      if (response.success && response.data) {
+        const { user, accessToken } = response.data;
+        setAuth(user, accessToken);
         router.push('/dashboard');
       }
     } catch (err: any) {
