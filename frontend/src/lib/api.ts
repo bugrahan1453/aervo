@@ -41,7 +41,7 @@ api.interceptors.response.use(
       localStorage.removeItem('accessToken');
       localStorage.removeItem('user');
       if (typeof window !== 'undefined') {
-        window.location.href = '/giris';
+        window.location.href = '/login';
       }
     }
 
