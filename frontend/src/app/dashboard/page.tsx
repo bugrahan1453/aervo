@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../../store/authStore';
 import { orderApi, userApi } from '../../lib/api';
 import type { Order, Package } from '../../types';
+import OrderForm from '../../components/OrderForm';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -46,6 +47,11 @@ export default function DashboardPage() {
   const handleLogout = () => {
     logout();
     router.push('/');
+  };
+
+  const handleFormSuccess = () => {
+    setShowOrderForm(false);
+    loadData(); // Siparişleri yeniden yükle
   };
 
   if (loading) {
@@ -160,21 +166,11 @@ export default function DashboardPage() {
 
         {/* Order Form */}
         {showOrderForm && (
-          <div className="bg-white p-8 rounded-xl shadow-lg mb-8">
-            <h3 className="text-2xl font-bold text-gray-800 mb-6">Yeni Drone Videosu Siparişi</h3>
-            <div className="text-center py-12">
-              <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-              </div>
-              <p className="text-gray-600 text-lg mb-4">
-                Sipariş formu yakında aktif olacak!
-              </p>
-              <p className="text-gray-500">
-                Google Maps entegrasyonu ve paket seçimi şu anda geliştiriliyor.
-              </p>
-            </div>
+          <div className="mb-8">
+            <OrderForm
+              onSuccess={handleFormSuccess}
+              onCancel={() => setShowOrderForm(false)}
+            />
           </div>
         )}
 
