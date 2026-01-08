@@ -63,6 +63,7 @@ const processVideoJob = async (job: Job) => {
     cameraAngles,
     hasLogo,
     hasCustomMusic,
+    musicPath,
   } = job.data;
 
   console.log(`🎬 Processing video for order ${orderId}`);
@@ -76,41 +77,41 @@ const processVideoJob = async (job: Job) => {
     await updateOrderStatus(orderId, 'PROCESSING');
 
     // Initialize video renderer
-    const renderer = new VideoRenderer(
+    const renderer = new VideoRenderer(`/tmp/video-processing/${orderId}`);
+
+    // Render video
+    console.log(`🎬 Rendering video...`);
+    await job.updateProgress(20);
+
+    const videoPath = await renderer.render({
+      orderId,
       latitude,
       longitude,
       duration,
       resolution,
       cameraAngles,
       hasLogo,
-      hasCustomMusic
-    );
-
-    // Step 1: Fetch satellite tiles
-    console.log(`📡 Fetching satellite imagery...`);
-    await job.updateProgress(20);
-    await renderer.fetchSatelliteTiles();
-
-    // Step 2: Render video
-    console.log(`🎬 Rendering video...`);
-    await job.updateProgress(50);
-    const { videoPath, thumbnailPath } = await renderer.renderVideo((progress) => {
-      // Update job progress (50-90%)
-      const jobProgress = 50 + Math.floor(progress * 40);
-      job.updateProgress(jobProgress);
+      hasCustomMusic,
+      musicPath,
     });
 
-    // Step 3: Upload to MinIO
+    await job.updateProgress(70);
+
+    // Generate thumbnail
+    console.log(`🖼️  Generating thumbnail...`);
+    const thumbnailPath = await renderer.generateThumbnail(videoPath);
+    await job.updateProgress(80);
+
+    // Upload to MinIO
     console.log(`☁️  Uploading to storage...`);
+    const videoUrl = await uploadToMinio(orderId, videoPath, 'video/mp4', false);
+    const thumbnailUrl = await uploadToMinio(orderId, thumbnailPath, 'image/jpeg', true);
     await job.updateProgress(90);
 
-    const videoUrl = await uploadToMinio(videoPath, `videos/${orderId}.mp4`);
-    const thumbnailUrl = await uploadToMinio(thumbnailPath, `thumbnails/${orderId}.jpg`);
-
-    // Step 4: Cleanup temporary files
+    // Cleanup temporary files
     await renderer.cleanup();
 
-    // Step 5: Update order status
+    // Update order status
     await updateOrderStatus(orderId, 'COMPLETED', videoUrl, thumbnailUrl);
     await job.updateProgress(100);
 

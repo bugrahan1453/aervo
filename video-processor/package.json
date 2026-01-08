@@ -12,6 +12,7 @@
   "author": "EmlakDrone Team",
   "license": "MIT",
   "dependencies": {
+    "axios": "^1.6.2",
     "bullmq": "^5.0.0",
     "dotenv": "^16.3.1",
     "fluent-ffmpeg": "^2.1.2",
