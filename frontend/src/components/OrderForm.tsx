@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { orderApi, userApi } from '../lib/api';
 import type { Package, CameraAngle, CreateOrderData } from '../types';
+import AddressSearch from './AddressSearch';
+import MapPicker from './MapPicker';
+import { useToastStore } from '../store/toastStore';
 
 interface OrderFormProps {
   onSuccess?: () => void;
@@ -13,6 +16,8 @@ export default function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
   const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showMap, setShowMap] = useState(false);
+  const { addToast } = useToastStore();
 
   const [formData, setFormData] = useState<CreateOrderData>({
     address: '',
@@ -76,6 +81,28 @@ export default function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
     setFormData({ ...formData, cameraAngles: angles });
   };
 
+  const handleAddressSelect = (address: string, lat: number, lng: number) => {
+    setFormData({
+      ...formData,
+      address,
+      latitude: lat,
+      longitude: lng,
+    });
+    addToast('Adres seçildi: ' + address, 'success');
+  };
+
+  const handleMapLocationSelect = (lat: number, lng: number, address?: string) => {
+    setFormData({
+      ...formData,
+      latitude: lat,
+      longitude: lng,
+      address: address || formData.address,
+    });
+    if (address) {
+      addToast('Lokasyon haritadan seçildi', 'success');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -96,13 +123,16 @@ export default function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
     try {
       const response: any = await orderApi.create(formData);
 
-      if (response.success) {
-        alert('Sipariş başarıyla oluşturuldu! Ödeme sayfasına yönlendiriliyorsunuz...');
-        if (onSuccess) onSuccess();
+      if (response.success && response.data) {
+        addToast('Sipariş oluşturuldu! Ödeme sayfasına yönlendiriliyorsunuz...', 'success');
+
+        // Redirect to payment page
+        setTimeout(() => {
+          window.location.href = `/payment/${response.data.id}`;
+        }, 1000);
       }
     } catch (err: any) {
       setError(err.message || 'Sipariş oluşturulurken hata oluştu');
-    } finally {
       setLoading(false);
     }
   };
@@ -118,22 +148,39 @@ export default function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Adres */}
+        {/* Adres - Google Maps */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            📍 Adres
+            📍 Adres Seçimi
           </label>
-          <input
-            type="text"
-            value={formData.address}
-            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            placeholder="Örn: Beşiktaş, İstanbul"
-            required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          <AddressSearch
+            onAddressSelect={handleAddressSelect}
+            initialValue={formData.address}
           />
-          <p className="mt-1 text-sm text-gray-500">
-            Google Maps entegrasyonu yakında eklenecek. Şimdilik manuel adres girebilirsiniz.
-          </p>
+
+          <button
+            type="button"
+            onClick={() => setShowMap(!showMap)}
+            className="mt-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
+          >
+            {showMap ? '🔼 Haritayı Gizle' : '🗺️ Haritadan Seç'}
+          </button>
+
+          {showMap && (
+            <div className="mt-4">
+              <MapPicker
+                onLocationSelect={handleMapLocationSelect}
+                initialLat={formData.latitude || undefined}
+                initialLng={formData.longitude || undefined}
+              />
+            </div>
+          )}
+
+          {formData.address && (
+            <p className="mt-2 text-sm text-green-600">
+              ✅ Seçilen adres: {formData.address}
+            </p>
+          )}
         </div>
 
         {/* Paket Seçimi */}

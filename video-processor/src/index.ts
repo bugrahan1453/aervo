@@ -1,5 +1,5 @@
 /**
- * Aervo Video Processor
+ * EmlakDrone Video Processor
  * FFmpeg-based video rendering service
  *
  * This service listens to the video-processing queue and renders videos
@@ -7,8 +7,9 @@
  */
 
 import { Worker, Job } from 'bullmq';
-import ffmpeg from 'fluent-ffmpeg';
-import { Client as MinioClient } from 'minio';
+import { VideoRenderer } from './renderer';
+import { uploadToMinio } from './upload';
+import axios from 'axios';
 
 // Queue connection
 const queueConnection = {
@@ -18,14 +19,28 @@ const queueConnection = {
   maxRetriesPerRequest: null,
 };
 
-// MinIO client
-const minioClient = new MinioClient({
-  endPoint: process.env.MINIO_ENDPOINT || 'localhost',
-  port: parseInt(process.env.MINIO_PORT || '9000', 10),
-  useSSL: process.env.MINIO_USE_SSL === 'true',
-  accessKey: process.env.MINIO_ACCESS_KEY || 'aervo_admin',
-  secretKey: process.env.MINIO_SECRET_KEY || '',
-});
+/**
+ * Update order status in backend API
+ */
+const updateOrderStatus = async (
+  orderId: string,
+  status: string,
+  videoUrl?: string,
+  thumbnailUrl?: string,
+  error?: string
+) => {
+  try {
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+    await axios.post(`${backendUrl}/api/orders/${orderId}/status`, {
+      status,
+      videoUrl,
+      thumbnailUrl,
+      error,
+    });
+  } catch (err) {
+    console.error(`Failed to update order ${orderId} status:`, err);
+  }
+};
 
 /**
  * Process video rendering job
@@ -39,7 +54,16 @@ const minioClient = new MinioClient({
  * 6. Update order status in database
  */
 const processVideoJob = async (job: Job) => {
-  const { orderId, latitude, longitude, duration, resolution, cameraAngles } = job.data;
+  const {
+    orderId,
+    latitude,
+    longitude,
+    duration,
+    resolution,
+    cameraAngles,
+    hasLogo,
+    hasCustomMusic,
+  } = job.data;
 
   console.log(`🎬 Processing video for order ${orderId}`);
   console.log(`📍 Location: ${latitude}, ${longitude}`);
@@ -49,26 +73,63 @@ const processVideoJob = async (job: Job) => {
 
   try {
     await job.updateProgress(10);
+    await updateOrderStatus(orderId, 'PROCESSING');
 
-    // TODO: Implement actual video rendering
-    // 1. Fetch satellite tiles from Google Maps Static API
-    // 2. Generate camera movements (spiral, orbit, zoom, flyover)
-    // 3. Use FFmpeg to create video from images
-    // 4. Add music, logo, and effects
-    // 5. Upload to MinIO
-    // 6. Generate thumbnail
-    // 7. Update database with video URL
+    // Initialize video renderer
+    const renderer = new VideoRenderer(
+      latitude,
+      longitude,
+      duration,
+      resolution,
+      cameraAngles,
+      hasLogo,
+      hasCustomMusic
+    );
+
+    // Step 1: Fetch satellite tiles
+    console.log(`📡 Fetching satellite imagery...`);
+    await job.updateProgress(20);
+    await renderer.fetchSatelliteTiles();
+
+    // Step 2: Render video
+    console.log(`🎬 Rendering video...`);
+    await job.updateProgress(50);
+    const { videoPath, thumbnailPath } = await renderer.renderVideo((progress) => {
+      // Update job progress (50-90%)
+      const jobProgress = 50 + Math.floor(progress * 40);
+      job.updateProgress(jobProgress);
+    });
+
+    // Step 3: Upload to MinIO
+    console.log(`☁️  Uploading to storage...`);
+    await job.updateProgress(90);
+
+    const videoUrl = await uploadToMinio(videoPath, `videos/${orderId}.mp4`);
+    const thumbnailUrl = await uploadToMinio(thumbnailPath, `thumbnails/${orderId}.jpg`);
+
+    // Step 4: Cleanup temporary files
+    await renderer.cleanup();
+
+    // Step 5: Update order status
+    await updateOrderStatus(orderId, 'COMPLETED', videoUrl, thumbnailUrl);
+    await job.updateProgress(100);
 
     console.log(`✅ Video rendered successfully for order ${orderId}`);
+    console.log(`📹 Video URL: ${videoUrl}`);
+    console.log(`🖼️  Thumbnail URL: ${thumbnailUrl}`);
 
     return {
       success: true,
       orderId,
-      videoUrl: `https://aervo.io/videos/${orderId}.mp4`,
-      thumbnailUrl: `https://aervo.io/thumbnails/${orderId}.jpg`,
+      videoUrl,
+      thumbnailUrl,
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error(`❌ Video rendering failed for order ${orderId}:`, error);
+
+    // Update order status to failed
+    await updateOrderStatus(orderId, 'FAILED', undefined, undefined, error.message);
+
     throw error;
   }
 };
@@ -94,7 +155,7 @@ videoWorker.on('error', (error) => {
 console.log(`
 ╔════════════════════════════════════════╗
 ║                                        ║
-║   🎬 AERVO VIDEO PROCESSOR STARTED     ║
+║  🎬 EMLAKDRONE VIDEO PROCESSOR STARTED ║
 ║                                        ║
 ║   Waiting for video rendering jobs...  ║
 ║                                        ║
