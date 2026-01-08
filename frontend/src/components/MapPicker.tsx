@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
-
-const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
+import { GoogleMap, Marker } from '@react-google-maps/api';
 
 const mapContainerStyle = {
   width: '100%',
@@ -60,22 +58,20 @@ export default function MapPicker({ onLocationSelect, initialLat, initialLng }: 
 
   return (
     <div className="w-full">
-      <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
-        <GoogleMap
-          mapContainerStyle={mapContainerStyle}
-          center={markerPosition || defaultCenter}
-          zoom={markerPosition ? 15 : 11}
-          onLoad={onLoad}
-          onClick={onClick}
-          options={{
-            streetViewControl: false,
-            mapTypeControl: true,
-            fullscreenControl: false,
-          }}
-        >
-          {markerPosition && <Marker position={markerPosition} />}
-        </GoogleMap>
-      </LoadScript>
+      <GoogleMap
+        mapContainerStyle={mapContainerStyle}
+        center={markerPosition || defaultCenter}
+        zoom={markerPosition ? 15 : 11}
+        onLoad={onLoad}
+        onClick={onClick}
+        options={{
+          streetViewControl: false,
+          mapTypeControl: true,
+          fullscreenControl: false,
+        }}
+      >
+        {markerPosition && <Marker position={markerPosition} />}
+      </GoogleMap>
 
       <p className="mt-2 text-sm text-gray-600">
         💡 Haritada istediğiniz noktaya tıklayarak lokasyon seçebilirsiniz

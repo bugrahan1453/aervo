@@ -2,6 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Toast from '../components/Toast';
+import { GoogleMapsProvider } from './providers';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,10 +19,12 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <body className={inter.className}>
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-          {children}
-          <Toast />
-        </div>
+        <GoogleMapsProvider>
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+            {children}
+            <Toast />
+          </div>
+        </GoogleMapsProvider>
       </body>
     </html>
   );
