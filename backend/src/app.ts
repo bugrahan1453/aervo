@@ -71,7 +71,7 @@ app.use('/api/', apiLimiter);
 app.get('/health', (req, res) => {
   res.json({
     success: true,
-    message: 'Aervo API is running',
+    message: 'EmlakDrone API is running',
     timestamp: new Date(),
     environment: env.NODE_ENV,
   });
@@ -88,7 +88,7 @@ app.use('/api/admin', adminRoutes);
 app.get('/api', (req, res) => {
   res.json({
     success: true,
-    message: 'Aervo API v1',
+    message: 'EmlakDrone API v1',
     endpoints: {
       auth: '/api/auth',
       user: '/api/user',

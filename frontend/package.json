@@ -1,7 +1,7 @@
 {
-  "name": "aervo-frontend",
+  "name": "emlakdrone-frontend",
   "version": "1.0.0",
-  "description": "Aervo - Sanal Drone Video Platform Frontend",
+  "description": "EmlakDrone - Sanal Drone Video Platform Frontend",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

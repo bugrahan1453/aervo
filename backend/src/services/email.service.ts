@@ -55,7 +55,7 @@ const replaceTemplateVars = (template: string, data: EmailTemplateData): string 
 
   // Add default variables
   result = result.replace(/{{frontendUrl}}/g, env.FRONTEND_URL);
-  result = result.replace(/{{appName}}/g, 'Aervo');
+  result = result.replace(/{{appName}}/g, 'EmlakDrone');
   result = result.replace(/{{year}}/g, new Date().getFullYear().toString());
 
   return result;

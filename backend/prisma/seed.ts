@@ -1,5 +1,5 @@
 /**
- * Aervo Database Seed
+ * EmlakDrone Database Seed
  * Creates initial data for development and production
  */
 
@@ -16,7 +16,7 @@ async function main() {
   // ============================================
   console.log('👤 Creating admin user...');
 
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@aervo.io';
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@emlakdrone.com';
   const adminPassword = process.env.ADMIN_PASSWORD || 'Admin123!';
   const hashedPassword = await bcrypt.hash(adminPassword, 12);
 
@@ -117,7 +117,7 @@ async function main() {
     {
       key: 'welcome',
       name: 'Hoş Geldiniz',
-      subject: 'Aervo\'ya Hoş Geldiniz! 🚁',
+      subject: 'EmlakDrone\'a Hoş Geldiniz! 🚁',
       html: `
         <!DOCTYPE html>
         <html>
@@ -135,11 +135,11 @@ async function main() {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🚁 Aervo'ya Hoş Geldiniz!</h1>
+              <h1>🚁 EmlakDrone'ya Hoş Geldiniz!</h1>
             </div>
             <div class="content">
               <p>Merhaba {{firstName}},</p>
-              <p>Aervo ailesine katıldığınız için çok mutluyuz! Sanal drone video platformumuzla, istediğiniz her lokasyonun muhteşem drone görüntülerini sadece birkaç tıkla elde edebilirsiniz.</p>
+              <p>EmlakDrone ailesine katıldığınız için çok mutluyuz! Sanal drone video platformumuzla, istediğiniz her lokasyonun muhteşem drone görüntülerini sadece birkaç tıkla elde edebilirsiniz.</p>
               <p><strong>Hemen başlayın:</strong></p>
               <ol>
                 <li>İstediğiniz adresi girin</li>
@@ -151,7 +151,7 @@ async function main() {
               <p>Herhangi bir sorunuz olursa, bize ulaşmaktan çekinmeyin!</p>
             </div>
             <div class="footer">
-              <p>&copy; 2025 Aervo. Tüm hakları saklıdır.</p>
+              <p>&copy; 2025 EmlakDrone. Tüm hakları saklıdır.</p>
             </div>
           </div>
         </body>
@@ -219,7 +219,7 @@ async function main() {
               <a href="{{frontendUrl}}/dashboard/siparisler" class="button">Siparişlerimi Görüntüle</a>
             </div>
             <div class="footer">
-              <p>&copy; 2025 Aervo. Tüm hakları saklıdır.</p>
+              <p>&copy; 2025 EmlakDrone. Tüm hakları saklıdır.</p>
             </div>
           </div>
         </body>
@@ -269,7 +269,7 @@ async function main() {
               <p>Hizmetimizden memnun kaldıysanız, arkadaşlarınızla paylaşmayı unutmayın! 🚁</p>
             </div>
             <div class="footer">
-              <p>&copy; 2025 Aervo. Tüm hakları saklıdır.</p>
+              <p>&copy; 2025 EmlakDrone. Tüm hakları saklıdır.</p>
             </div>
           </div>
         </body>
@@ -314,11 +314,11 @@ async function main() {
                 <li>Ödemeniz güvende, iade işlemi yapılmayacak</li>
               </ul>
               <p>24 saat içinde sizinle iletişime geçeceğiz. Acil bir durumsa, destek ekibimize ulaşabilirsiniz.</p>
-              <a href="mailto:destek@aervo.io" class="button">Destek Ekibi ile İletişime Geç</a>
+              <a href="mailto:destek@emlakdrone.io" class="button">Destek Ekibi ile İletişime Geç</a>
               <p>Anlayışınız için teşekkür ederiz.</p>
             </div>
             <div class="footer">
-              <p>&copy; 2025 Aervo. Tüm hakları saklıdır.</p>
+              <p>&copy; 2025 EmlakDrone. Tüm hakları saklıdır.</p>
             </div>
           </div>
         </body>
@@ -344,10 +344,10 @@ async function main() {
 
   const settings = [
     // General
-    { key: 'site_name', value: 'Aervo', category: 'general' },
+    { key: 'site_name', value: 'EmlakDrone', category: 'general' },
     { key: 'site_description', value: 'Sanal Drone Video Platformu', category: 'general' },
-    { key: 'contact_email', value: 'info@aervo.io', category: 'general' },
-    { key: 'support_email', value: 'destek@aervo.io', category: 'general' },
+    { key: 'contact_email', value: 'info@emlakdrone.io', category: 'general' },
+    { key: 'support_email', value: 'destek@emlakdrone.io', category: 'general' },
     { key: 'maintenance_mode', value: 'false', category: 'system' },
 
     // Pricing addons

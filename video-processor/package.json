@@ -1,7 +1,7 @@
 {
-  "name": "aervo-video-processor",
+  "name": "emlakdrone-video-processor",
   "version": "1.0.0",
-  "description": "Aervo Video Processing Service with FFmpeg",
+  "description": "EmlakDrone Video Processing Service with FFmpeg",
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon src/index.ts",
@@ -9,7 +9,7 @@
     "start": "node dist/index.js"
   },
   "keywords": ["video", "ffmpeg", "processing"],
-  "author": "Aervo Team",
+  "author": "EmlakDrone Team",
   "license": "MIT",
   "dependencies": {
     "bullmq": "^5.0.0",

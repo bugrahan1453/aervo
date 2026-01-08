@@ -1,7 +1,7 @@
 {
-  "name": "aervo-backend",
+  "name": "emlakdrone-backend",
   "version": "1.0.0",
-  "description": "Aervo - Sanal Drone Video Platform Backend API",
+  "description": "EmlakDrone - Sanal Drone Video Platform Backend API",
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon src/index.ts",
@@ -20,7 +20,7 @@
     "platform",
     "aervo"
   ],
-  "author": "Aervo Team",
+  "author": "EmlakDrone Team",
   "license": "MIT",
   "dependencies": {
     "@prisma/client": "^5.8.0",
