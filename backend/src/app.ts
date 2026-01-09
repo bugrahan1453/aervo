@@ -36,11 +36,17 @@ app.use(
   })
 );
 
-// CORS
+// CORS - Allow both www and non-www
 app.use(
   cors({
-    origin: env.FRONTEND_URL,
+    origin: [
+      'https://emlakdrone.com',
+      'https://www.emlakdrone.com',
+      'http://localhost:3000', // Development
+    ],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Internal-API-Key'],
   })
 );
 
