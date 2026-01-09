@@ -23,7 +23,7 @@
   "author": "EmlakDrone Team",
   "license": "MIT",
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.8.0",
