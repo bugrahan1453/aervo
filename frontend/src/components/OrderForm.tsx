@@ -46,8 +46,12 @@ export default function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
       const response: any = await userApi.getPackages();
       if (response.success && response.data) {
         setPackages(response.data);
-        const starter = response.data.find((p: Package) => p.type === 'STARTER');
-        if (starter) setSelectedPackage(starter);
+        // Paketleri sortOrder'a göre sırala ve ilkini seç (FREE ilk sırada olacak)
+        const sortedPackages = response.data.sort((a: Package, b: Package) => a.sortOrder - b.sortOrder);
+        if (sortedPackages.length > 0) {
+          setSelectedPackage(sortedPackages[0]);
+          setFormData({ ...formData, packageType: sortedPackages[0].type });
+        }
       }
     } catch (err) {
       console.error('Paket yükleme hatası:', err);
@@ -67,7 +71,7 @@ export default function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
     setCalculatedPrice(price);
   };
 
-  const handlePackageChange = (packageType: 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE') => {
+  const handlePackageChange = (packageType: 'FREE' | 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE') => {
     setFormData({ ...formData, packageType });
     const pkg = packages.find(p => p.type === packageType);
     if (pkg) setSelectedPackage(pkg);

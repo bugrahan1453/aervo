@@ -49,7 +49,7 @@ export const createOrderSchema = z.object({
   address: z.string().min(5, 'Adres en az 5 karakter olmalıdır'),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
-  packageType: z.enum(['STARTER', 'PROFESSIONAL', 'ENTERPRISE']),
+  packageType: z.enum(['FREE', 'STARTER', 'PROFESSIONAL', 'ENTERPRISE']),
   cameraAngles: z
     .array(z.enum(['spiral', 'zoom_in', 'orbit', 'flyover']))
     .min(1, 'En az bir kamera açısı seçilmelidir'),
@@ -99,7 +99,7 @@ export const createPaymentSchema = z.object({
 // ============================================
 
 export const createPackageSchema = z.object({
-  type: z.enum(['STARTER', 'PROFESSIONAL', 'ENTERPRISE']),
+  type: z.enum(['FREE', 'STARTER', 'PROFESSIONAL', 'ENTERPRISE']),
   name: z.string().min(2, 'Paket adı en az 2 karakter olmalıdır'),
   description: z.string().optional(),
   duration: z.number().min(10).max(300),

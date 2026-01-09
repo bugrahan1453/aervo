@@ -15,7 +15,7 @@ export interface User {
 
 export interface Package {
   id: string;
-  type: 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
+  type: 'FREE' | 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
   name: string;
   description?: string;
   duration: number;
@@ -34,7 +34,7 @@ export interface Order {
   address: string;
   latitude: number;
   longitude: number;
-  packageType: 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
+  packageType: 'FREE' | 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
   duration: number;
   resolution: string;
   cameraAngles: CameraAngle[];
