@@ -188,14 +188,20 @@ export const queueOrderForProcessing = async (orderId: string) => {
       throw new ApiError(404, 'Sipariş bulunamadı');
     }
 
-    if (order.status !== OrderStatus.PAID) {
+    // FREE paketler ödeme gerektirmez, PENDING durumunda queue'ya alınabilir
+    if (order.totalPrice > 0 && order.status !== OrderStatus.PAID) {
       throw new ApiError(400, 'Sipariş henüz ödenmemiş');
     }
 
-    // Update order status
+    // Update order status to QUEUED or PAID if it's FREE
+    const newStatus = order.totalPrice === 0 ? OrderStatus.PAID : order.status;
     await prisma.order.update({
       where: { id: orderId },
-      data: { status: OrderStatus.QUEUED },
+      data: {
+        status: OrderStatus.QUEUED,
+        paymentStatus: order.totalPrice === 0 ? 'COMPLETED' : order.paymentStatus,
+        paidAt: order.totalPrice === 0 && !order.paidAt ? new Date() : order.paidAt,
+      },
     });
 
     // Add to queue
