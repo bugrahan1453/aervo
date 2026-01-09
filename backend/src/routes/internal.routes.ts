@@ -5,7 +5,7 @@
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
-import { prisma } from '../lib/prisma';
+import { prisma } from '../config/database';
 import { ApiError, asyncHandler } from '../middlewares/error';
 import { OrderStatus } from '@prisma/client';
 
