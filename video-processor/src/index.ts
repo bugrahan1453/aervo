@@ -31,12 +31,22 @@ const updateOrderStatus = async (
 ) => {
   try {
     const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
-    await axios.post(`${backendUrl}/api/orders/${orderId}/status`, {
-      status,
-      videoUrl,
-      thumbnailUrl,
-      error,
-    });
+    const internalApiKey = process.env.INTERNAL_API_KEY || 'development-internal-key-change-in-production';
+
+    await axios.post(
+      `${backendUrl}/api/internal/orders/${orderId}/status`,
+      {
+        status,
+        videoUrl,
+        thumbnailUrl,
+        error,
+      },
+      {
+        headers: {
+          'X-Internal-API-Key': internalApiKey,
+        },
+      }
+    );
   } catch (err) {
     console.error(`Failed to update order ${orderId} status:`, err);
   }

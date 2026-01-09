@@ -19,6 +19,7 @@ import userRoutes from './routes/user.routes';
 import orderRoutes from './routes/order.routes';
 import paymentRoutes from './routes/payment.routes';
 import adminRoutes from './routes/admin.routes';
+import internalRoutes from './routes/internal.routes';
 
 // Create Express app
 const app: Application = express();
@@ -83,6 +84,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/internal', internalRoutes);
 
 // API documentation
 app.get('/api', (req, res) => {

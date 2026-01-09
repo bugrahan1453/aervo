@@ -191,6 +191,7 @@ export class VideoRenderer {
 
       ffmpeg()
         .input(inputPattern)
+        .inputOptions(['-y']) // Allow overwrite
         .inputFPS(this.framerate)
         .videoCodec('libx264')
         .size(resolution)
@@ -206,12 +207,17 @@ export class VideoRenderer {
         .on('progress', (progress) => {
           console.log(`🎬 Encoding: ${Math.round(progress.percent || 0)}%`);
         })
+        .on('stderr', (stderrLine) => {
+          console.log('FFmpeg stderr:', stderrLine);
+        })
         .on('end', () => {
           console.log(`✅ Video created: ${outputPath}`);
           resolve(outputPath);
         })
-        .on('error', (error) => {
+        .on('error', (error, stdout, stderr) => {
           console.error('❌ FFmpeg error:', error);
+          console.error('FFmpeg stdout:', stdout);
+          console.error('FFmpeg stderr:', stderr);
           reject(error);
         })
         .run();
