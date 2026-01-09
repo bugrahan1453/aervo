@@ -22,9 +22,6 @@
   ],
   "author": "EmlakDrone Team",
   "license": "MIT",
-  "prisma": {
-    "seed": "npx ts-node prisma/seed.ts"
-  },
   "dependencies": {
     "@prisma/client": "^5.8.0",
     "axios": "^1.6.2",
