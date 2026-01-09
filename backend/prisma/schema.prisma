@@ -115,6 +115,7 @@ model Order {
 }
 
 enum PackageType {
+  FREE          // Ücretsiz Test
   STARTER       // Başlangıç
   PROFESSIONAL  // Profesyonel
   ENTERPRISE    // Kurumsal

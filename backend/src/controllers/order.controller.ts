@@ -41,11 +41,22 @@ export const createOrder = asyncHandler(async (req: AuthRequest, res: Response) 
     locationMeta.city
   );
 
-  res.status(201).json({
-    success: true,
-    data: order,
-    message: 'Sipariş oluşturuldu. Ödeme işlemini tamamlayın.',
-  });
+  // If FREE package, start video processing immediately
+  if (order.totalPrice === 0 && order.packageType === 'FREE') {
+    await videoService.queueOrderForProcessing(order.id);
+
+    res.status(201).json({
+      success: true,
+      data: order,
+      message: 'Ücretsiz sipariş oluşturuldu. Video işleme başladı!',
+    });
+  } else {
+    res.status(201).json({
+      success: true,
+      data: order,
+      message: 'Sipariş oluşturuldu. Ödeme işlemini tamamlayın.',
+    });
+  }
 });
 
 /**

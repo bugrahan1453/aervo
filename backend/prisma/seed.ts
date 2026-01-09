@@ -42,6 +42,24 @@ async function main() {
 
   const packages = [
     {
+      type: PackageType.FREE,
+      name: 'Ücretsiz Test',
+      description: 'Sistemi test etmek için ücretsiz deneme paketi. Ödeme gerektirmez.',
+      duration: 15,
+      resolution: '1080p',
+      maxAngles: 1,
+      price: 0,
+      features: [
+        '15 saniye video',
+        'Full HD (1080p) kalite',
+        '1 kamera açısı (spiral)',
+        'Standart müzik',
+        'Test amaçlı',
+        'Logo ekleme yok',
+      ],
+      sortOrder: 0,
+    },
+    {
       type: PackageType.STARTER,
       name: 'Başlangıç',
       description: 'Küçük projeler ve kişisel kullanım için ideal başlangıç paketi.',

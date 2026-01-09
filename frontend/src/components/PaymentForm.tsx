@@ -93,7 +93,9 @@ export default function PaymentForm({ orderId, amount, onSuccess, onError }: Pay
         }
       }
     } catch (err: any) {
-      if (onError) onError(err.message || 'Ödeme işlemi başarısız');
+      console.error('Payment error:', err);
+      const errorMessage = err?.response?.data?.message || err?.message || 'Ödeme işlemi başarısız';
+      if (onError) onError(errorMessage);
     } finally {
       setLoading(false);
     }

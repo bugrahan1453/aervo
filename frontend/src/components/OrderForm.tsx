@@ -124,12 +124,25 @@ export default function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
       const response: any = await orderApi.create(formData);
 
       if (response.success && response.data) {
-        addToast('Sipariş oluşturuldu! Ödeme sayfasına yönlendiriliyorsunuz...', 'success');
+        // Check if it's a free package (price = 0)
+        const isFree = calculatedPrice === 0 || response.data.totalPrice === 0;
 
-        // Redirect to payment page
-        setTimeout(() => {
-          window.location.href = `/payment/${response.data.id}`;
-        }, 1000);
+        if (isFree) {
+          // Free package - no payment needed, video processing starts immediately
+          addToast('Ücretsiz sipariş oluşturuldu! Video hazırlanmaya başladı.', 'success');
+
+          setTimeout(() => {
+            if (onSuccess) onSuccess();
+            window.location.href = '/dashboard';
+          }, 1500);
+        } else {
+          // Paid package - redirect to payment page
+          addToast('Sipariş oluşturuldu! Ödeme sayfasına yönlendiriliyorsunuz...', 'success');
+
+          setTimeout(() => {
+            window.location.href = `/payment/${response.data.id}`;
+          }, 1000);
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Sipariş oluşturulurken hata oluştu');
