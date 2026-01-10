@@ -84,6 +84,11 @@ services:
       DATABASE_URL: postgresql://aervo:${DB_PASSWORD:-aervo_db_password_change_this}@postgres:5432/aervo
       REDIS_HOST: redis
       MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_USE_SSL: false
+      MINIO_BUCKET: emlakdrone
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-aervo_admin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-emlakdrone_minio_secret_2025_secure}
     volumes:
       - ./backend/uploads:/app/uploads
       - ./storage:/app/storage
@@ -135,6 +140,11 @@ services:
     environment:
       REDIS_HOST: redis
       MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_USE_SSL: false
+      MINIO_BUCKET: emlakdrone
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-aervo_admin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-emlakdrone_minio_secret_2025_secure}
     volumes:
       - ./storage:/app/storage
       - ./video-processor/assets:/app/assets
