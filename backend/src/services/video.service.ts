@@ -38,6 +38,16 @@ export const createOrder = async (
       throw new ApiError(404, 'Paket bulunamadı veya aktif değil');
     }
 
+    // For FREE package, use all camera angles if not specified or less than max
+    if (data.packageType === PackageType.FREE && data.cameraAngles.length < pkg.maxAngles) {
+      data.cameraAngles = [
+        CameraAngle.SPIRAL,
+        CameraAngle.ZOOM_IN,
+        CameraAngle.ORBIT,
+        CameraAngle.FLYOVER,
+      ];
+    }
+
     // Validate camera angles count
     if (data.cameraAngles.length > pkg.maxAngles) {
       throw new ApiError(

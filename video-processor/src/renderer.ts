@@ -83,16 +83,32 @@ export class VideoRenderer {
    */
   private async generateFrames(options: RenderOptions, totalFrames: number) {
     console.log(`📸 Generating ${totalFrames} frames...`);
+    console.log(`🎥 Camera angles: ${options.cameraAngles.join(', ')}`);
+
+    const numAngles = options.cameraAngles.length;
+    const framesPerAngle = Math.floor(totalFrames / numAngles);
 
     for (let i = 0; i < totalFrames; i++) {
-      const progress = i / totalFrames;
+      const globalProgress = i / totalFrames;
 
-      // Calculate camera position based on angle
+      // Determine which camera angle to use for this frame
+      const angleIndex = Math.min(
+        Math.floor(i / framesPerAngle),
+        numAngles - 1
+      );
+      const currentAngle = options.cameraAngles[angleIndex];
+
+      // Calculate local progress within current angle segment (0-1)
+      const localProgress = numAngles === 1
+        ? globalProgress
+        : ((i % framesPerAngle) / framesPerAngle);
+
+      // Calculate camera position based on current angle
       const { lat, lng, zoom } = this.calculateCameraPosition(
         options.latitude,
         options.longitude,
-        progress,
-        options.cameraAngles[0] // Use first camera angle
+        localProgress,
+        currentAngle
       );
 
       // Fetch satellite tile from Google Maps Static API
@@ -108,7 +124,7 @@ export class VideoRenderer {
       await fs.writeFile(framePath, jpegBuffer);
 
       if (i % 30 === 0) {
-        console.log(`📸 Frame ${i}/${totalFrames} (${Math.round(progress * 100)}%)`);
+        console.log(`📸 Frame ${i}/${totalFrames} (${Math.round(globalProgress * 100)}%) - ${currentAngle}`);
       }
     }
   }
