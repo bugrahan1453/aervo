@@ -42,7 +42,7 @@ router.post(
 
     if (videoUrl) updateData.videoUrl = videoUrl;
     if (thumbnailUrl) updateData.thumbnailUrl = thumbnailUrl;
-    if (error) updateData.processingError = error;
+    if (error) updateData.errorMessage = error;
 
     const order = await prisma.order.update({
       where: { id },
