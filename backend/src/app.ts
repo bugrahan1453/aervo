@@ -36,19 +36,8 @@ app.use(
   })
 );
 
-// CORS - Allow both www and non-www
-app.use(
-  cors({
-    origin: [
-      'https://emlakdrone.com',
-      'https://www.emlakdrone.com',
-      'http://localhost:3000', // Development
-    ],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Internal-API-Key'],
-  })
-);
+// CORS is handled by nginx reverse proxy
+// No need for CORS middleware here to avoid duplicate headers
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
