@@ -8,6 +8,7 @@ import ffmpeg from 'fluent-ffmpeg';
 import fs from 'fs/promises';
 import path from 'path';
 import { execSync } from 'child_process';
+import sharp from 'sharp';
 
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY || '';
 const TILE_SIZE = 640;
@@ -97,9 +98,14 @@ export class VideoRenderer {
       // Fetch satellite tile from Google Maps Static API
       const imageBuffer = await this.fetchStaticMapImage(lat, lng, zoom);
 
+      // Convert PNG to JPEG (Google Maps returns PNG by default)
+      const jpegBuffer = await sharp(imageBuffer)
+        .jpeg({ quality: 90 })
+        .toBuffer();
+
       // Save frame
       const framePath = path.join(this.framesDir, `frame_${String(i).padStart(5, '0')}.jpg`);
-      await fs.writeFile(framePath, imageBuffer);
+      await fs.writeFile(framePath, jpegBuffer);
 
       if (i % 30 === 0) {
         console.log(`📸 Frame ${i}/${totalFrames} (${Math.round(progress * 100)}%)`);
